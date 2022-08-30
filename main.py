@@ -2,6 +2,7 @@ import logging
 import os
 
 from dotenv import load_dotenv
+from google.cloud import dialogflow
 from telegram import Update
 from telegram.ext import (
     Application,
@@ -19,14 +20,43 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def detect_intent_text(
+    project_id: str,
+    session_id: str,
+    text: str,
+    language_code: str
+) -> str:
+    """Returns the result of detect intent with text as input.
+
+    Using the same `session_id` between requests allows continuation
+    of the conversation."""
+    session_client = dialogflow.SessionsClient()
+    session = session_client.session_path(project_id, session_id)
+    text_input = dialogflow.TextInput(text=text, language_code=language_code)
+    query_input = dialogflow.QueryInput(text=text_input)
+    response = session_client.detect_intent(
+        request={"session": session, "query_input": query_input}
+    )
+    return response.query_result.fulfillment_text
+
+
+async def resend_dialogflow_message(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    '''Send dialogflow messages to Telegram chat.'''
+    dialogflow_message = detect_intent_text(
+        project_id='newagent-wmfw',
+        session_id=update.message.chat_id,
+        text=update.message.text,
+        language_code='ru-RU'
+    )
+    await update.message.reply_text(dialogflow_message)
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     '''Send a message when the command /start is issued.'''
     await update.message.reply_text('Здравствуйте')
-
-
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    '''Echo the user message.'''
-    await update.message.reply_text(update.message.text)
 
 
 def main() -> None:
@@ -36,7 +66,10 @@ def main() -> None:
     application = Application.builder().token(tg_token).build()
     application.add_handler(CommandHandler('start', start))
     application.add_handler(
-        MessageHandler(filters.TEXT & ~filters.COMMAND, echo)
+        MessageHandler(
+            filters.TEXT & ~filters.COMMAND,
+            resend_dialogflow_message
+        )
     )
     application.run_polling()
 
