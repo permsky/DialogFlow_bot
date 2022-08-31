@@ -2,4 +2,6 @@
 
 /creds
 
+*__pycache__
+
 .env
