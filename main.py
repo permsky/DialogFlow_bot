@@ -60,7 +60,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 def main() -> None:
-    '''Start the bot.'''
+    '''Start Telegram-bot.'''
     load_dotenv()
     tg_token = os.getenv('TG_BOT_TOKEN')
     application = Application.builder().token(tg_token).build()
