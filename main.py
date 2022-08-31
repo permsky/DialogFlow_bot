@@ -26,16 +26,16 @@ def detect_intent_text(
     text: str,
     language_code: str
 ) -> str:
-    """Returns the result of detect intent with text as input.
+    '''Returns the result of detect intent with text as input.
 
     Using the same `session_id` between requests allows continuation
-    of the conversation."""
+    of the conversation.'''
     session_client = dialogflow.SessionsClient()
     session = session_client.session_path(project_id, session_id)
     text_input = dialogflow.TextInput(text=text, language_code=language_code)
     query_input = dialogflow.QueryInput(text=text_input)
     response = session_client.detect_intent(
-        request={"session": session, "query_input": query_input}
+        request={'session': session, 'query_input': query_input}
     )
     return response.query_result.fulfillment_text
 
@@ -46,10 +46,10 @@ async def resend_dialogflow_message(
 ) -> None:
     '''Send dialogflow messages to Telegram chat.'''
     dialogflow_message = detect_intent_text(
-        project_id='newagent-wmfw',
+        project_id=context.bot_data['project_id'],
         session_id=update.message.chat_id,
         text=update.message.text,
-        language_code='ru-RU'
+        language_code=context.bot_data['language_code']
     )
     await update.message.reply_text(dialogflow_message)
 
@@ -64,6 +64,8 @@ def main() -> None:
     load_dotenv()
     tg_token = os.getenv('TG_BOT_TOKEN')
     application = Application.builder().token(tg_token).build()
+    application.bot_data['project_id'] = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
+    application.bot_data['language_code'] = os.getenv('LANGUAGE_CODE')
     application.add_handler(CommandHandler('start', start))
     application.add_handler(
         MessageHandler(
