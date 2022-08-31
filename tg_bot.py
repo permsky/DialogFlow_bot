@@ -2,8 +2,6 @@ import logging
 import os
 
 from dotenv import load_dotenv
-from google.cloud import dialogflow
-from google.cloud.dialogflow_v2.types.session import DetectIntentResponse
 from telegram import Update
 from telegram.ext import (
     Application,
@@ -13,28 +11,14 @@ from telegram.ext import (
     filters
 )
 
+from dialogflow_utils import detect_intent_text
+
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
-
-
-def detect_intent_text(
-    project_id: str,
-    session_id: str,
-    text: str,
-    language_code: str
-) -> DetectIntentResponse:
-    '''Returns the result of detect intent'''
-    session_client = dialogflow.SessionsClient()
-    session = session_client.session_path(project_id, session_id)
-    text_input = dialogflow.TextInput(text=text, language_code=language_code)
-    query_input = dialogflow.QueryInput(text=text_input)
-    return session_client.detect_intent(
-        request={'session': session, 'query_input': query_input}
-    )
 
 
 async def resend_dialogflow_message(

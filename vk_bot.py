@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from vk_api.longpoll import VkLongPoll, VkEventType, Event
 from vk_api.vk_api import VkApiMethod
 
-from tg_bot import detect_intent_text
+from dialogflow_utils import detect_intent_text
 
 
 def echo(event: Event, vk_api: VkApiMethod) -> None:
