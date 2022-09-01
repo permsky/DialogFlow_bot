@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 
 from dotenv import load_dotenv
 from telegram import Update
@@ -12,13 +13,7 @@ from telegram.ext import (
 )
 
 from dialogflow_utils import detect_intent_text
-
-
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO
-)
-logger = logging.getLogger(__name__)
+from tg_logger import TelegramLogsHandler
 
 
 async def resend_dialogflow_message(
@@ -46,6 +41,7 @@ def main() -> None:
     '''Start Telegram-bot.'''
     load_dotenv()
     tg_token = os.getenv('TG_BOT_TOKEN')
+    chat_id = os.getenv('ADMIN_CHAT_ID')
     application = Application.builder().token(tg_token).build()
     application.bot_data['project_id'] = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
     application.bot_data['language_code'] = os.getenv('LANGUAGE_CODE')
@@ -56,7 +52,17 @@ def main() -> None:
             resend_dialogflow_message
         )
     )
-    application.run_polling()
+
+    logger = logging.getLogger('Logger')
+    logger.setLevel(logging.WARNING)
+    logger.addHandler(TelegramLogsHandler(application.bot, chat_id))
+
+    while True:
+        try:
+            application.run_polling()
+        except Exception as exc:
+            logger.exception(exc)
+            time.sleep(60)
 
 
 if __name__ == '__main__':

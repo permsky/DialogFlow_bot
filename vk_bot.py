@@ -1,12 +1,16 @@
+import logging
 import os
 import random
+import time
 
 import vk_api as vk
 from dotenv import load_dotenv
+from telegram.ext import Application
 from vk_api.longpoll import VkLongPoll, VkEventType, Event
 from vk_api.vk_api import VkApiMethod
 
 from dialogflow_utils import detect_intent_text
+from tg_logger import TelegramLogsHandler
 
 
 def echo(event: Event, vk_api: VkApiMethod) -> None:
@@ -41,19 +45,32 @@ def resend_dialogflow_message(
 def main() -> None:
     '''Start VK-bot.'''
     load_dotenv()
+    tg_token = os.getenv('TG_BOT_TOKEN')
+    chat_id = os.getenv('ADMIN_CHAT_ID')
     vk_session = vk.VkApi(token=os.getenv('VK_GROUP_TOKEN'))
     project_id=os.getenv('GOOGLE_CLOUD_PROJECT_ID')
     language_code=os.getenv('LANGUAGE_CODE')
-    longpoll = VkLongPoll(vk_session)
-    vk_api = vk_session.get_api()
-    for event in longpoll.listen():
-        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            resend_dialogflow_message(
-                event=event,
-                vk_api=vk_api,
-                project_id=project_id,
-                language_code=language_code
-            )
+
+    logger = logging.getLogger('Logger')
+    logger.setLevel(logging.WARNING)
+    application = Application.builder().token(tg_token).build()
+    logger.addHandler(TelegramLogsHandler(application.bot, chat_id))
+
+    while True:
+        try:
+            longpoll = VkLongPoll(vk_session)
+            vk_api = vk_session.get_api()
+            for event in longpoll.listen():
+                if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+                    resend_dialogflow_message(
+                        event=event,
+                        vk_api=vk_api,
+                        project_id=project_id,
+                        language_code=language_code
+                    )
+        except Exception as exc:
+            logger.exception(exc)
+            time.sleep(60)
 
 
 if __name__ == '__main__':
