@@ -1,6 +1,10 @@
 # Пример работы Telegram и VK ботов с [DialogFlow API](https://dialogflow.cloud.google.com/)
 
 Репозиторий содержит скрипты для запуска Telegram и VK ботов, а также скрипт для обучения DialogFlow агента.
+Работа Telegram-бота: 
+![](bot_screencasts/tg_bot.gif)
+Работа VK-бота: 
+![](bot_screencasts/vk_bot.gif)
 
 ## Запуск
 
