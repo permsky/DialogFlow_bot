@@ -30,7 +30,7 @@ def resend_dialogflow_message(
         vk_api.messages.send(
             user_id=event.user_id,
             message=dialogflow_response.query_result.fulfillment_text,
-            random_id=random.randint(1,1000)
+            random_id=random.randint(1, 1000)
         )
 
 
@@ -40,8 +40,8 @@ def main() -> None:
     tg_token = os.getenv('TG_BOT_TOKEN')
     chat_id = os.getenv('ADMIN_CHAT_ID')
     vk_session = vk.VkApi(token=os.getenv('VK_GROUP_TOKEN'))
-    project_id=os.getenv('GOOGLE_CLOUD_PROJECT_ID')
-    language_code=os.getenv('LANGUAGE_CODE')
+    project_id = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
+    language_code = os.getenv('LANGUAGE_CODE')
 
     logger = logging.getLogger('Logger')
     logger.setLevel(logging.WARNING)

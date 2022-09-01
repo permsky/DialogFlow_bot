@@ -40,7 +40,7 @@ def main() -> None:
     filepath = os.getenv('TRAINING_PHRASES_FILEPATH')
     with open(filepath, 'r', encoding='utf-8') as intents_file:
         intents = json.load(intents_file)
-    
+
     for intent, intent_content in intents.items():
         create_intent(
             project_id=project_id,
