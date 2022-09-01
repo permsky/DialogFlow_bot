@@ -13,14 +13,6 @@ from dialogflow_utils import detect_intent_text
 from tg_logger import TelegramLogsHandler
 
 
-def echo(event: Event, vk_api: VkApiMethod) -> None:
-    vk_api.messages.send(
-        user_id=event.user_id,
-        message=event.text,
-        random_id=random.randint(1,1000)
-    )
-
-
 def resend_dialogflow_message(
     event: Event,
     vk_api: VkApiMethod,
