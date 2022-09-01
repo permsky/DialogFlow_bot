@@ -34,7 +34,10 @@ async def resend_dialogflow_message(
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     '''Send a message when the command /start is issued.'''
-    await update.message.reply_text('Здравствуйте')
+    await update.message.reply_text(
+        f'Здравствуйте! Вас приветствует бот-помошник. '
+        f'Задавайте ваши вопросы.'
+    )
 
 
 def main() -> None:
