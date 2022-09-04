@@ -13,6 +13,9 @@ from dialogflow_utils import detect_intent_text
 from tg_logger import TelegramLogsHandler
 
 
+logger = logging.getLogger('Logger')
+
+
 def resend_dialogflow_message(
     event: Event,
     vk_api: VkApiMethod,
@@ -43,7 +46,6 @@ def main() -> None:
     project_id = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
     language_code = os.getenv('LANGUAGE_CODE')
 
-    logger = logging.getLogger('Logger')
     logger.setLevel(logging.WARNING)
     application = Application.builder().token(tg_token).build()
     logger.addHandler(TelegramLogsHandler(application.bot, chat_id))

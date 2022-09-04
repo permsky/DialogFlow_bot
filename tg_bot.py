@@ -16,6 +16,9 @@ from dialogflow_utils import detect_intent_text
 from tg_logger import TelegramLogsHandler
 
 
+logger = logging.getLogger('Logger')
+
+
 async def resend_dialogflow_message(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
@@ -56,7 +59,6 @@ def main() -> None:
         )
     )
 
-    logger = logging.getLogger('Logger')
     logger.setLevel(logging.WARNING)
     logger.addHandler(TelegramLogsHandler(application.bot, chat_id))
 
